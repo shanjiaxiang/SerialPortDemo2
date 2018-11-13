@@ -8,14 +8,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.lang.annotation.Target;
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android_serialport_api.SerialPort;
 import android_serialport_api.SerialPortUtil;
 
 
@@ -51,6 +48,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        stopInventory();
     }
 
+
+    //打开串口，连接读写器，并设置监听
     private void connect(){
         //打开串口
         if (serialPortUtil == null){
@@ -76,9 +75,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Toast.makeText(this, "连接成功", Toast.LENGTH_SHORT).show();
     }
 
+    //从返回数组中读取EPC并添加到全局变量
     private void getEPC(byte[] buffer, int size){
-        if (((int)buffer[1] == -105)&&((int)buffer[2] == 34)){
-//        if (((int)buffer[1] == -106)&&((int)buffer[2] == 34)){
+        if (((int)buffer[1] == -105)&&((int)buffer[2] == 34)){          //循环读取
+//        if (((int)buffer[1] == -106)&&((int)buffer[2] == 34)){        //单次读取
             Log.d(TAG, "getEpc if branch");
             byte[] epc_buffer = new byte[12];
             String epcStr = null;
@@ -101,13 +101,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.d(TAG, "reader:" + Thread.currentThread().getName());
             }
 
-//            stopInventory();
         } else {
             Log.d(TAG, "getEpc if-else branch");
         }
     }
 
-
+    //开始盘点
     private void startInventory(){
         Log.d(TAG, "send bytes: " + Arrays.toString(ConvertUtil.hexToBytes(START_INVENTORY)));
         boolean flag = serialPortUtil.sendBuffer(ConvertUtil.hexToBytes(START_INVENTORY));
@@ -119,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Toast.makeText(this, "开始盘点", Toast.LENGTH_SHORT).show();
     }
 
-
+    //结束盘点
     private void stopInventory(){
         serialPortUtil.sendBuffer(ConvertUtil.hexToBytes(STOP_INVENTORY));
         Log.d(TAG, "stoped....");
@@ -127,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-
+    //实例化VIEW组件，设置监听
     private void findViewAndSetClick() {
         tvEpcList = (TextView)findViewById(R.id.tv_epc_list);
         start_inventory = (Button) findViewById(R.id.bt_start_inventory);
@@ -140,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         clear_inventory.setOnClickListener(this);
     }
 
-
+    //点击回调
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -167,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.d(TAG, "closed....");
     }
 
-
+    //主线程显示EPC信息
     private void displayEpcInfo(){
 
         runOnUiThread(new Runnable() {
@@ -221,8 +220,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tvEpcList.setText("");
         isDisplayInfo = false;
     }
-
-
-
-
 }
