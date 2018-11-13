@@ -5,13 +5,17 @@ package com.mit.serialportdemo2;
  */
 
 public class StringUtil {
-    public static String bytesToHex(byte[] bytes) {
-        StringBuilder buf = new StringBuilder(bytes.length * 2);
-        for(byte b : bytes) { // 使用String的format方法进行转换
-            buf.append(String.format("%02x", new Integer(b & 0xff)));
-        }
 
-        return buf.toString();
+    public static String bytesToHex( byte[] b) {
+        StringBuilder strTmp = new StringBuilder();
+        for (int i = 0; i < b.length; i++) {
+            String hex = Integer.toHexString(b[i] & 0xFF);
+            if (hex.length() == 1) {
+                hex = '0' + hex;
+            }
+            strTmp.append(hex);
+        }
+        return strTmp.toString();
     }
 
 }
